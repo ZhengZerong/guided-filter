@@ -16,7 +16,6 @@ static cv::Mat boxfilter(const cv::Mat &I, const cv::Mat &mask, int r)
 	cv::blur(I, result, cv::Size(r, r));
 	cv::blur(mask, result_mask, cv::Size(r, r));
 
-
 	for (int ri = 0; ri < result.rows; ri++)
 		for (int ci = 0; ci < result.cols;ci++)
 		{
@@ -124,8 +123,12 @@ cv::Mat GuidedFilterMonoWithMask::filterSingleChannel(const cv::Mat &p) const
 	cv::Mat mean_p = boxfilter(p, M, r);
 	cv::Mat mean_Ip = boxfilter(I.mul(p), M, r);
 	cv::Mat cov_Ip = mean_Ip - mean_I.mul(mean_p); // this is the covariance of (I, p) in each local patch.
+    
+    cv::Mat eps_mat = cv::Mat(mean_p.rows, mean_p.cols, CV_32F, cv::Scalar::all(eps));
+    eps_mat = eps_mat.mul(M);
+    eps_mat = boxfilter(eps_mat, r) + eps*0.00001;
 
-	cv::Mat a = cov_Ip / (var_I + eps); // Eqn. (5) in the paper;
+	cv::Mat a = cov_Ip / (var_I + eps_mat); // Eqn. (5) in the paper;
 	cv::Mat b = mean_p - a.mul(mean_I); // Eqn. (6) in the paper;
 
 	cv::Mat mean_a = boxfilter(a, M, r);
