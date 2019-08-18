@@ -82,7 +82,22 @@ private:
 	cv::Mat invrr, invrg, invrb, invgg, invgb, invbb;
 };
 
+class GuidedFilterColorWithMask : public GuidedFilterImpl
+{
+public:
+    GuidedFilterColorWithMask(const cv::Mat &I, const cv::Mat &M, int r, double eps);
 
+private:
+    virtual cv::Mat filterSingleChannel(const cv::Mat &p) const;
+
+private:
+    std::vector<cv::Mat> Ichannels;
+    int r;
+    double eps;
+    cv::Mat M;
+    cv::Mat mean_I_r, mean_I_g, mean_I_b;
+    cv::Mat invrr, invrg, invrb, invgg, invgb, invbb;
+};
 
 cv::Mat guidedFilter(const cv::Mat &I, const cv::Mat &p, int r, double eps, int depth = -1);
 cv::Mat guidedFilter(const cv::Mat &I, const cv::Mat &mask, const cv::Mat &p, int r, double eps, int depth = -1);
